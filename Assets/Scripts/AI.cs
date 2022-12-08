@@ -7,14 +7,14 @@ using UnityEngine.AI;
 public class AI : MonoBehaviour
 {
     private NavMeshAgent _agent;
-    [SerializeField] private List<Transform> _walkPath;
+    private List<Transform> _walkPath;
     private Transform _target;
     private int _currentTarget;
 
     private void OnEnable()
     {
+        _walkPath = AIPathManager.instance.runTheCourse;
         _agent = GetComponent<NavMeshAgent>();
-        
         TravelToDestination();
     }
 
@@ -27,5 +27,11 @@ public class AI : MonoBehaviour
         }
 
         _agent.SetDestination(_walkPath[_currentTarget].position);
+    }
+
+    private void OnDeath()
+    {
+        SpawnManager.instance.enemiesKilled++;
+        gameObject.SetActive(false);
     }
 }
