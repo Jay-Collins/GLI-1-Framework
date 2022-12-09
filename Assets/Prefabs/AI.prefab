@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b97c6f9de38b47f4c95a4c97e11a6007, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _minHideTime: 4
+  _maxHideTime: 8
 --- !u!195 &3762656183283098369
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -128,7 +130,7 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3762656183283098368}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.5
   m_Height: 2
