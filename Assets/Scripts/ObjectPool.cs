@@ -2,20 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ObjectPool : MonoSingleton<ObjectPool>
 {
+    [Header("Pooled AI for use - Generated automatically")]
+    [SerializeField] private List<GameObject> _aiPool;
+    
     [Header("AI Settings")]
     [SerializeField] private GameObject _aiPrefab;
     [SerializeField] private int _aiToPool;
-    [SerializeField] private List<GameObject> _aiPool;
     [SerializeField] private GameObject _aiContainer;
-
-    public override void Init()
-    {
-        //_aiPool = GenerateAI(_aiToPool);
-    }
-
+    
     public void Start() => _aiPool = GenerateAI(_aiToPool);
     
 

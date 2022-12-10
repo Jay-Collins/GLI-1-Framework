@@ -96,9 +96,11 @@ public class SpawnManager : MonoSingleton<SpawnManager>
     private void SpawnAI()
     {
         var ai = ObjectPool.instance.RequestAI();
-        var pos = new Vector3(42f, 1.7f, 1.45f);
-        
+        var pos = new Vector3(40, 2.1f, 1.45f);
+
+        ai.transform.Rotate(new Vector3(0,-90f));
         ai.transform.position = pos;
+        ai.SetActive(true);
     }
 
     private IEnumerator StageZero()

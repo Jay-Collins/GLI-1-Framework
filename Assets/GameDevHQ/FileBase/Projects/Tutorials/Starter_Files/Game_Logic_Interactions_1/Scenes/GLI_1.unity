@@ -7620,7 +7620,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402941606}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -20.57, y: 3.82, z: -6.64}
+  m_LocalPosition: {x: -20.57, y: 3.867, z: -6.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12415,7 +12415,7 @@ GameObject:
   m_Component:
   - component: {fileID: 586003526}
   m_Layer: 0
-  m_Name: Hide Points
+  m_Name: Hide Points Container
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24017,10 +24017,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce974958833948645adebebbc036d5ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _aiPrefab: {fileID: 3762656183283098368, guid: f9979778475f6034db63a68b4d45c12f,
-    type: 3}
-  _aiToPool: 5
   _aiPool: []
+  _aiPrefab: {fileID: 4614011628887954691, guid: b6e1b2f5d420e034385efd1ef269a205,
+    type: 3}
+  _aiToPool: 25
   _aiContainer: {fileID: 1775443598}
 --- !u!4 &1055838183
 Transform:
@@ -24104,7 +24104,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1058510577
 PrefabInstance:
@@ -36777,7 +36777,7 @@ PrefabInstance:
     - target: {fileID: 3497286374441318163, guid: 964413c647e7ca441b457d50316abc87,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3497286374441318163, guid: 964413c647e7ca441b457d50316abc87,
         type: 3}
@@ -42376,7 +42376,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1775443598}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 40.46, y: -2.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42395,6 +42395,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02db44e3767036342be131c3fb419db1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hidePointsContainer: {fileID: 586003525}
+  hidePoints: []
   runTheCourse:
   - {fileID: 971374872}
   - {fileID: 1117161133}
@@ -42810,7 +42812,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1795252704}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.13649058, y: 4.4334173, z: 1.3131084}
+  m_LocalPosition: {x: 40.556, y: 1.54, z: 1.3131084}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -42829,7 +42831,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c12bb0a29a6e944d819d74004877d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _stageOneAIToKill: 3
+  _stageOneAIToKill: 25
   _stageTwoAIToKill: 5
   _stageThreeAIToKill: 7
   _spawnTimeMin: 3
