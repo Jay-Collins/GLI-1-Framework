@@ -6,6 +6,7 @@ using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using Object = UnityEngine.Object;
 using Random = System.Random;
 
 public class AI : MonoBehaviour
@@ -18,32 +19,31 @@ public class AI : MonoBehaviour
     private NavMeshAgent _agent;
     private List<Transform> _walkPath;
     private List<Transform> _hidePoints;
+    private Transform _hideSpot;
     private Transform _target;
     private int _currentTarget;
-    private RaycastHit _raycastHit;
     private float _closestHidingSpot;
-    private Transform _hideSpot;
-    private bool _currentlyHiding;
+    private bool _onDeath;
+    private bool _dead;
+    
 
-    [Header("Astronaut Max Speed")] 
+    [Header("Astronaut Settings")] 
     [SerializeField] private float _speed;
+    [SerializeField] private float _detectDeadDistance;
 
     [Header("Hide Timer")] 
     [SerializeField] private int _minHideTime;
     [SerializeField] private int _maxHideTime;
 
-    [Header("Astronaut and Backpack Object")] 
+    [Header("Astronaut Object And Component References")] 
     [SerializeField] private SkinnedMeshRenderer _astronautObject;
     [SerializeField] private SkinnedMeshRenderer _astronautBackpackObject;
-
-    [Header("Astronaut Animator")] 
     [SerializeField] private Animator _animator;
-
-    private static readonly int Speed = Animator.StringToHash("speed");
 
     private void OnEnable()
     {
-        AI.deathCry += Hide;
+        Shoot.aiGotShot += GotShot;
+        deathCry += Hide;
         
         _currentAIState = aiStates.Run;
         _walkPath = AIPathManager.instance.runTheCourse;
@@ -55,14 +55,10 @@ public class AI : MonoBehaviour
 
     private void Update()
     {
+        if (_dead) return;
+        
         DecisionMaking();
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            _currentAIState = aiStates.Hide;
-            _closestHidingSpot = Mathf.Infinity;
-            StartCoroutine(HideTimer());
-        }
-
+        
         _agent.speed = _speed;
         _animator.SetFloat("Speed", _speed);
     }
@@ -80,7 +76,8 @@ public class AI : MonoBehaviour
                 break;
             
             case aiStates.Death:
-                OnDeath();
+                if (_onDeath) 
+                    OnDeath();
                 break;
         }
     }
@@ -96,21 +93,35 @@ public class AI : MonoBehaviour
         _agent.SetDestination(_walkPath[_currentTarget].position);
     }
 
+    private void GotShot(Object hitInfo)
+    {
+        if (hitInfo == gameObject.transform)
+        {
+            _onDeath = true;
+            _currentAIState = aiStates.Death;
+        }
+    }
+    
     private void OnDeath()
     {
-        deathCry?.Invoke(transform.position);
+        deathCry -= Hide;
+        
+        _onDeath = false;
+        _agent.enabled = false;
         _animator.SetBool("Death", true);
         // add 50 points
-        _currentAIState = aiStates.Death;
         SpawnManager.instance.enemiesKilled++;
-        gameObject.SetActive(false);
+        _dead = true;
+        deathCry?.Invoke(transform.position);
     }
 
     private void Hide(Vector3 deadAI)
     {
+        if (!gameObject.activeInHierarchy) return;
+            
         var distance = Vector3.Distance(transform.position, deadAI);
 
-        if (distance <= 10)
+        if (distance <= _detectDeadDistance)
         {
             _currentAIState = aiStates.Hide;
             _closestHidingSpot = Mathf.Infinity;
