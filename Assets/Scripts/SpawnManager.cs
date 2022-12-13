@@ -5,72 +5,84 @@ using System.Runtime.InteropServices;
 using System.Xml;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class SpawnManager : MonoSingleton<SpawnManager>
 {
-    [Header("Enemies needed to progress to the next stage")]
-    [SerializeField] private int _stageOneAIToKill;
-    [SerializeField] private int _stageTwoAIToKill;
-    [SerializeField] private int _stageThreeAIToKill;
+    [SerializeField] private float _stageTransitionWaitTime;
     [Header("The minimum and maximum amount of time it takes to spawn an AI")]
-    [SerializeField] private float _spawnTimeMin;
-    [SerializeField] private float _spawnTimeMax;
+    [SerializeField] private float _stageOneSpawnTimeMin;
+    [SerializeField] private float _stageOneSpawnTimeMax;
+    [SerializeField] private float _stageTwoSpawnTimeMin;
+    [SerializeField] private float _stageTwoSpawnTimeMax;
+    [SerializeField] private float _stageThreeSpawnTimeMin;
+    [SerializeField] private float _stageThreeSpawnTimeMax;
     
     [NonSerialized] public int enemiesKilled;
-    private int _stage;
+    [NonSerialized] public static int enemies;
+    [NonSerialized] public bool spawnAI;
+    [NonSerialized] public int stage;
+    
     private int _aiToSpawn;
-    private bool _spawnAI;
     private int _aiSpawned;
     private bool _stageStarted;
     private float _spawnTimer;
     
+    private void Start()
+    {
+        _spawnTimer = Random.Range(_stageOneSpawnTimeMin, _stageOneSpawnTimeMax);
+    }
+    
     private void Update()
     {
+        enemies = _aiSpawned - enemiesKilled;
+        
         Stages();
 
-        if (_spawnAI)
+        if (spawnAI)
             AISpawner();
     }
 
-    private void Start() => _spawnTimer = Random.Range(_spawnTimeMin, _spawnTimeMax);
-    
     private void Stages()
     {
-        switch (_stage)
+        switch (stage)
         {
             case 0:
                 if (!_stageStarted)
                     StartCoroutine(StageZero());
                 break;
             case 1:
-                _aiToSpawn = _stageOneAIToKill;
                 if (!_stageStarted) 
                     StartCoroutine(StartStage());
-                if (enemiesKilled > _stageOneAIToKill)
+                if (UIManager.instance.timeOver && enemies == 0)
                 {
-                    _stage++;
+                    UIManager.instance.timerActive = false;
+                    UIManager.instance.ResetTimer();
                     _stageStarted = false;
+                    stage++;
                 }
                 break;
             case 2:
-                _aiToSpawn = _stageTwoAIToKill;
                 if (!_stageStarted) 
                     StartCoroutine(StartStage());
-                if (enemiesKilled > _stageTwoAIToKill)
+                if (UIManager.instance.timeOver && enemies == 0)
                 {
-                    _stage++;
+                    UIManager.instance.timerActive = false;
+                    UIManager.instance.ResetTimer();
+                    stage++;
                     _stageStarted = false;
                 }
                 break;
             case 3:
-                _aiToSpawn = _stageThreeAIToKill;
                 if (!_stageStarted) 
                     StartCoroutine(StartStage());
-                if (enemiesKilled > _stageThreeAIToKill)
+                if (UIManager.instance.timeOver && enemies == 0)
                 {
-                    _stage++;
+                    UIManager.instance.timerActive = false;
+                    UIManager.instance.ResetTimer();
+                    stage++;
                     _stageStarted = false;
                 }
                 break;
@@ -87,9 +99,7 @@ public class SpawnManager : MonoSingleton<SpawnManager>
         {
             SpawnAI();
             _aiSpawned++;
-            if (_aiSpawned >= _aiToSpawn)
-                _spawnAI = false;
-            _spawnTimer = Random.Range(_spawnTimeMin, _spawnTimeMax);
+            _spawnTimer = Random.Range(_stageOneSpawnTimeMin, _stageOneSpawnTimeMax);
         }
     }
     
@@ -105,18 +115,20 @@ public class SpawnManager : MonoSingleton<SpawnManager>
 
     private IEnumerator StageZero()
     {
+        UIManager.instance.StageDisplay();
         _stageStarted = true;
-        yield return new WaitForSeconds(5);
-        _stage++;
+        yield return new WaitForSeconds(_stageTransitionWaitTime);
+        stage++;
         _stageStarted = false;
     }
 
     private IEnumerator StartStage()
     {
+        Debug.Log("stage: " + stage);
+        UIManager.instance.StageDisplay();
         _stageStarted = true;
-        _spawnAI = false;
-        _aiSpawned = 0;
-        yield return new WaitForSeconds(5);
-        _spawnAI = true;
+        yield return new WaitForSeconds(_stageTransitionWaitTime);
+        UIManager.instance.timerActive = true;
+        spawnAI = true;
     }
 }

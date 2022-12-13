@@ -307,6 +307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 6
   _detectDeadDistance: 15
+  _scoreAwarded: 50
   _minHideTime: 4
   _maxHideTime: 10
   _astronautObject: {fileID: 4614011628893231107}

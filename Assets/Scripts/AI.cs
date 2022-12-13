@@ -30,6 +30,7 @@ public class AI : MonoBehaviour
     [Header("Astronaut Settings")] 
     [SerializeField] private float _speed;
     [SerializeField] private float _detectDeadDistance;
+    [SerializeField] private int _scoreAwarded;
 
     [Header("Hide Timer")] 
     [SerializeField] private int _minHideTime;
@@ -109,7 +110,7 @@ public class AI : MonoBehaviour
         _onDeath = false;
         _agent.enabled = false;
         _animator.SetBool("Death", true);
-        // add 50 points
+        UIManager.score += _scoreAwarded;
         SpawnManager.instance.enemiesKilled++;
         _dead = true;
         deathCry?.Invoke(transform.position);
