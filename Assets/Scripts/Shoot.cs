@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Shoot : MonoBehaviour
 {
@@ -33,8 +30,10 @@ public class Shoot : MonoBehaviour
     {
         ammo--;
         _canFire = Time.time + _fireRate;
-        AudioSource.PlayClipAtPoint(_shotSound, transform.position);
-        
+        if (_shotSound is not null) // null check
+            AudioSource.PlayClipAtPoint(_shotSound, transform.position);
+
+        if (_mainCamera is null) return; // null check
         if (Physics.Raycast(_mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)), out var hitInfo, Mathf.Infinity, 1 << 6 | 1 << 8 | 1 << 9))
         {
             switch (hitInfo.collider.gameObject.layer)

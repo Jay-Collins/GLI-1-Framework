@@ -1,16 +1,11 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Xml;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 public class SpawnManager : MonoSingleton<SpawnManager>
 {
+    public float stageTime;
     [SerializeField] private float _stageTransitionWaitTime;
     [Header("The minimum and maximum amount of time it takes to spawn an AI")]
     [SerializeField] private float _stageOneSpawnTimeMin;
@@ -21,6 +16,7 @@ public class SpawnManager : MonoSingleton<SpawnManager>
     [SerializeField] private float _stageThreeSpawnTimeMax;
     
     [NonSerialized] public int enemiesKilled;
+    [NonSerialized] public int enemiesWon;
     [NonSerialized] public static int enemies;
     [NonSerialized] public bool spawnAI;
     [NonSerialized] public int stage;
@@ -37,7 +33,7 @@ public class SpawnManager : MonoSingleton<SpawnManager>
     
     private void Update()
     {
-        enemies = _aiSpawned - enemiesKilled;
+        enemies = _aiSpawned - enemiesKilled - enemiesWon;
         
         Stages();
 
@@ -54,40 +50,38 @@ public class SpawnManager : MonoSingleton<SpawnManager>
                     StartCoroutine(StageZero());
                 break;
             case 1:
-                if (!_stageStarted) 
-                    StartCoroutine(StartStage());
-                if (UIManager.instance.timeOver && enemies == 0)
-                {
-                    UIManager.instance.timerActive = false;
-                    UIManager.instance.ResetTimer();
-                    _stageStarted = false;
-                    stage++;
-                }
+                StageEnd();
                 break;
             case 2:
-                if (!_stageStarted) 
-                    StartCoroutine(StartStage());
-                if (UIManager.instance.timeOver && enemies == 0)
-                {
-                    UIManager.instance.timerActive = false;
-                    UIManager.instance.ResetTimer();
-                    stage++;
-                    _stageStarted = false;
-                }
+                StageEnd();
                 break;
             case 3:
-                if (!_stageStarted) 
-                    StartCoroutine(StartStage());
-                if (UIManager.instance.timeOver && enemies == 0)
-                {
-                    UIManager.instance.timerActive = false;
-                    UIManager.instance.ResetTimer();
-                    stage++;
-                    _stageStarted = false;
-                }
+                StageEnd();
                 break;
             case 4:
+                UIManager.instance.youWin = true;
                 break;
+        }
+    }
+
+    private void StageEnd()
+    {
+        if (!_stageStarted) 
+            StartCoroutine(StartStage());
+        if (UIManager.instance.timeOver && enemies == 0)
+        {
+            UIManager.instance.timerActive = false;
+            UIManager.instance.ResetTimer();
+
+            if (enemiesKilled - enemiesWon < _aiSpawned / 2)
+            {
+                UIManager.instance.youLose = true;
+            }
+            else
+            {
+                _stageStarted = false;
+                stage++;
+            }
         }
     }
 
@@ -130,6 +124,8 @@ public class SpawnManager : MonoSingleton<SpawnManager>
 
     private IEnumerator StartStage()
     {
+        _aiSpawned = 0;
+        enemiesKilled = 0;
         Debug.Log("stage: " + stage);
         UIManager.instance.StageDisplay();
         _stageStarted = true;

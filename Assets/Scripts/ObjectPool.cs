@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class ObjectPool : MonoSingleton<ObjectPool>
 {
@@ -16,16 +13,15 @@ public class ObjectPool : MonoSingleton<ObjectPool>
     
     public void Start() => _aiPool = GenerateAI(_aiToPool);
     
-
     List<GameObject> GenerateAI(int amountOfAI)
     {
         for (var i = 0; i < amountOfAI; i++)
         {
             var ai = Instantiate(_aiPrefab, _aiContainer.transform, true);
-            ai.SetActive(false);
+            ai?.SetActive(false);
             _aiPool.Add(ai);
         }
-
+        
         return _aiPool;
     }
 
@@ -34,7 +30,7 @@ public class ObjectPool : MonoSingleton<ObjectPool>
         // Loop through ai list
         foreach (var ai in _aiPool)
         {
-            if (ai.activeInHierarchy == false)
+            if (ai?.activeInHierarchy == false)
             {
                 // ai is available
                 ai.SetActive(true);
@@ -44,7 +40,7 @@ public class ObjectPool : MonoSingleton<ObjectPool>
         
         // if we made it to this point we need to generate more ai
         GameObject newAI = Instantiate(_aiPrefab, _aiContainer.transform, true);
-        newAI.SetActive(false);
+        newAI?.SetActive(false);
         _aiPool.Add(newAI);
         
         return newAI;

@@ -1,17 +1,9 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using TMPro.EditorUtilities;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.AI;
-using Object = UnityEngine.Object;
-using Random = System.Random;
+using Random = UnityEngine.Random;
+
 
 public class AI1 : MonoBehaviour
 {
@@ -28,6 +20,8 @@ public class AI1 : MonoBehaviour
     [Header("Astronaut Settings")] 
     [SerializeField] private float _speed;
     [SerializeField] private int _scoreAwarded;
+    
+    [Header("Total value must be less than Stage Transition Wait Time")]
     [SerializeField] private float _despawnTime;
     [SerializeField] private float _fadeOutMultiplier = 1;
     
@@ -52,19 +46,20 @@ public class AI1 : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _currentAIState = aiStates.Run;
         ColorSelector();
-        
-        _agent.SetDestination(_wayPoints[0].position);
-        _animator.SetFloat("Speed", _speed);
+
+        _agent?.SetDestination(_wayPoints[0].position);
+        _animator?.SetFloat("Speed", _speed);
     }
 
     private void Update()
     {
-        Debug.Log(_index);
+        // Debug.Log(_index);
         if (_dead) return;
         
         DecisionMaking();
 
-        _agent.speed = _speed;
+        if (_agent is not null) // null check
+            _agent.speed = _speed;
     }
 
     private void DecisionMaking()
@@ -94,8 +89,8 @@ public class AI1 : MonoBehaviour
         }
         else if (_agent.remainingDistance < 0.5f && _index == 0)
         {
-            _index = UnityEngine.Random.Range(_index + 1, _wayPoints.Count - 1);
-            _agent.SetDestination(_wayPoints[_index].position);
+            _index = Random.Range(_index + 1, _wayPoints.Count - 1);
+            _agent?.SetDestination(_wayPoints[_index].position);
         }
         else if (!_agent.pathPending && !_agent.hasPath)
             _currentAIState = aiStates.Hide;
@@ -103,24 +98,24 @@ public class AI1 : MonoBehaviour
     
     private IEnumerator HideStateRoutine()
     {
-        Debug.Log("Hiding");
+        // Debug.Log("Hiding");
         
         _hideTimerStarted = true;
-        _animator.SetBool("Hiding", true);
-        yield return new WaitForSeconds(UnityEngine.Random.Range(_minHideTime, _maxHideTime));
-        _animator.SetBool("Hiding", false);
+        _animator?.SetBool("Hiding", true);
+        yield return new WaitForSeconds(Random.Range(_minHideTime, _maxHideTime));
+        _animator?.SetBool("Hiding", false);
         
-        Debug.Log("Running");
+        // Debug.Log("Running");
 
         if (_index > 21)
         {
             _index = _wayPoints.Count - 1;
-            _agent.SetDestination(_wayPoints[_wayPoints.Count - 1].position);
+            _agent?.SetDestination(_wayPoints[_wayPoints.Count - 1].position);
         }
         else
         {
             _index = UnityEngine.Random.Range(_index + 1, _wayPoints.Count - 1);
-            _agent.SetDestination(_wayPoints[_index].position);
+            _agent?.SetDestination(_wayPoints[_index].position);
         }
 
         _currentAIState = aiStates.Run;
@@ -135,23 +130,35 @@ public class AI1 : MonoBehaviour
     
     private void OnWin()
     {
+        SpawnManager.instance.enemiesWon += 1;
         _aiWins = true;
-        AudioSource.PlayClipAtPoint(_pathCompleteSound, transform.position);
+        if (_pathCompleteSound is not null) // null check
+            AudioSource.PlayClipAtPoint(_pathCompleteSound, transform.position);
+        if (_collider is not null) // null check
+            _collider.isTrigger = true;
+        if (_agent is not null) // null check
+        {
+            _agent.isStopped = true;
+            _agent.ResetPath();
+        }
+        _index = 0;
+        gameObject.SetActive(false);
     }
 
     private void OnDeath()
     {
-        _collider.isTrigger = true;
-        _agent.isStopped = true;
-        _agent.ResetPath();
+        if (_collider is not null) // null check
+            _collider.isTrigger = true;
+        if (_agent is not null) // null check
+        {
+            _agent.isStopped = true;
+            _agent.ResetPath();
+        }
         _index = 0;
-
-        _animator.SetBool("Death", true);
+        _animator?.SetBool("Death", true);
         _dead = true;
-        
-        if (_deathSounds != null) 
+        if (_deathSounds is not null) // null check
             AudioSource.PlayClipAtPoint(_deathSounds[UnityEngine.Random.Range(0, _deathSounds.Length - 1)], transform.position);
-        
         UIManager.score += _scoreAwarded;
         SpawnManager.instance.enemiesKilled++;
 
@@ -169,14 +176,15 @@ public class AI1 : MonoBehaviour
         {
             colorMain.a -= Time.deltaTime * _fadeOutMultiplier;
             colorSub.a -= Time.deltaTime * _fadeOutMultiplier;
-
-            _astronautObject.material.color = colorMain;
-            _astronautBackpackObject.material.color = colorSub;
+            if (_astronautObject is not null) // null check
+                _astronautObject.material.color = colorMain;
+            if (_astronautBackpackObject is not null) // null check
+                _astronautBackpackObject.material.color = colorSub;
             
             yield return new WaitForEndOfFrame();
         }
         
-        Debug.Log("Setting false!");
+        // Debug.Log("Setting false!");
         gameObject.SetActive(false);
     }
     
@@ -185,17 +193,19 @@ public class AI1 : MonoBehaviour
         _dead = false;
         _aiWins = false;
         _hideTimerStarted = false;
-        _agent.isStopped = false;
+        if (_agent is not null) // null check
+            _agent.isStopped = false;
         _currentAIState = aiStates.Run;
         Shoot.aiGotShot -= GotShot;
     }
 
     private void ColorSelector()
     {
-        var selector = UnityEngine.Random.Range(0, 7);
+        var selector = Random.Range(0, 7);
         var astronaut = _astronautObject.material;
         var backpack = _astronautBackpackObject.material;
         
+        if (_astronautObject is null || _astronautBackpackObject is null) return; // null check
         switch (selector)
         {
             case 0:
