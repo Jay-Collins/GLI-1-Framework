@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shoot : MonoBehaviour
 {
     public static Action<Transform> aiGotShot;
+    public static Action<Transform> barrierGotShot;
     public static int ammo;
     
     [SerializeField] private Camera _mainCamera;
@@ -43,6 +44,7 @@ public class Shoot : MonoBehaviour
                     Debug.Log("Kill confirmed!");
                     break;
                 case 8:
+                    barrierGotShot(hitInfo.transform);
                     AudioSource.PlayClipAtPoint(_shotBarrierSound, transform.position);
                     Debug.Log("Barrier was shot!");
                     break;
