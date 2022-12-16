@@ -28707,7 +28707,7 @@ MonoBehaviour:
   _aiPool: []
   _aiPrefab: {fileID: 4614011628887954691, guid: b6e1b2f5d420e034385efd1ef269a205,
     type: 3}
-  _aiToPool: 25
+  _aiToPool: 40
   _aiContainer: {fileID: 1775443598}
 --- !u!4 &1055838183
 Transform:
@@ -50296,7 +50296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c12bb0a29a6e944d819d74004877d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stageTime: 10
+  stageTime: 60
   _stageTransitionWaitTime: 5
   _stageOneSpawnTimeMin: 2
   _stageOneSpawnTimeMax: 7

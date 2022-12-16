@@ -158,7 +158,7 @@ public class AI1 : MonoBehaviour
         _animator?.SetBool("Death", true);
         _dead = true;
         if (_deathSounds is not null) // null check
-            AudioSource.PlayClipAtPoint(_deathSounds[UnityEngine.Random.Range(0, _deathSounds.Length - 1)], transform.position);
+            AudioSource.PlayClipAtPoint(_deathSounds[Random.Range(0, _deathSounds.Length - 1)], transform.position);
         UIManager.score += _scoreAwarded;
         SpawnManager.instance.enemiesKilled++;
 
