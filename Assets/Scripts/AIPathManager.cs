@@ -6,13 +6,10 @@ using UnityEngine;
 public class AIPathManager : MonoSingleton<AIPathManager>
 {
     [SerializeField] GameObject _hidePointsContainer;
-    private Transform[] _hidePointsChildren;
+    private Collider[] _hidePointsChildren;
     
     [Header("Points the AI may hide at - Generated automatically")]
-    public List<Transform> hidePoints;
-    
-    [Header("The path the AI follows.")]
-    public List<Transform> runTheCourse;
+    public List<Transform> wayPoints;
 
     private void OnEnable()
     {
@@ -21,11 +18,11 @@ public class AIPathManager : MonoSingleton<AIPathManager>
 
     private void GenerateHidePointsList()
     {
-        _hidePointsChildren = _hidePointsContainer.GetComponentsInChildren<Transform>();
+        _hidePointsChildren = _hidePointsContainer.GetComponentsInChildren<Collider>();
 
         foreach (var child in _hidePointsChildren)
         { 
-            hidePoints.Add(child);
+            wayPoints.Add(child.transform);
         }
     }
     

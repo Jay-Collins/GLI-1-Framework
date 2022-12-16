@@ -1,9 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using TMPro.EditorUtilities;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -17,20 +21,20 @@ public class AI : MonoBehaviour
     private aiStates _currentAIState;
     
     private NavMeshAgent _agent;
-    private List<Transform> _walkPath;
-    private List<Transform> _hidePoints;
+    private List<Transform> _wayPoints;
     private Transform _hideSpot;
-    private Transform _target;
-    private int _currentTarget;
+    private int _index;
     private float _closestHidingSpot;
     private bool _onDeath;
     private bool _dead;
-    
+    private bool _initialWaypoint;
 
     [Header("Astronaut Settings")] 
     [SerializeField] private float _speed;
     [SerializeField] private float _detectDeadDistance;
     [SerializeField] private int _scoreAwarded;
+    [SerializeField] private AudioClip[] _deathSounds;
+    [SerializeField] private AudioClip _pathCompleteSound;
 
     [Header("Hide Timer")] 
     [SerializeField] private int _minHideTime;
@@ -45,13 +49,13 @@ public class AI : MonoBehaviour
     {
         Shoot.aiGotShot += GotShot;
         deathCry += Hide;
-        
+
         _currentAIState = aiStates.Run;
-        _walkPath = AIPathManager.instance.runTheCourse;
-        _hidePoints = AIPathManager.instance.hidePoints;
+        _wayPoints = AIPathManager.instance.wayPoints;
         _agent = GetComponent<NavMeshAgent>();
-        _currentAIState = aiStates.Run;
         ColorSelector();
+        // travel to first point
+        _agent.SetDestination(_wayPoints[0].position);
     }
 
     private void Update()
@@ -85,13 +89,35 @@ public class AI : MonoBehaviour
 
     private void TravelToDestination()
     {
-        if (_agent.remainingDistance < 0.5f)
+        // check if close to current destination
+        // randomly select next point
+        // after arriving, activate hide
+        // select next waypoint going forward
+        // if within 4 waypoints of end, just go to end
+        
+        if (_agent.remainingDistance < 0.5 && _index != 0)
         {
-            if (_currentTarget < _walkPath.Count - 1)
-                _currentTarget++;
+            Debug.Log("TravelToDestination If 1");
+            if (_animator.GetBool("Hiding") == false)
+            {
+                _animator.SetBool("Hiding", true);
+                StartCoroutine(HideTimer());
+            }
         }
-
-        _agent.SetDestination(_walkPath[_currentTarget].position);
+        
+        if (!_initialWaypoint)
+        {
+            Debug.Log("TravelToDestination If 2");
+            _initialWaypoint = true;
+            _index = UnityEngine.Random.Range(_index + 1, _wayPoints.Count - 1);
+            _agent.SetDestination(_wayPoints[_index].position);
+        }
+    }
+    
+    private void PathCompleted()
+    {
+        Debug.Log("Made it!");
+        AudioSource.PlayClipAtPoint(_pathCompleteSound, transform.position);
     }
 
     private void GotShot(Object hitInfo)
@@ -106,7 +132,7 @@ public class AI : MonoBehaviour
     private void OnDeath()
     {
         deathCry -= Hide;
-        
+        AudioSource.PlayClipAtPoint(_deathSounds[UnityEngine.Random.Range(0,3)], transform.position);
         _onDeath = false;
         _agent.enabled = false;
         _animator.SetBool("Death", true);
@@ -116,8 +142,15 @@ public class AI : MonoBehaviour
         deathCry?.Invoke(transform.position);
     }
 
+    private void OnDisable()
+    {
+        Shoot.aiGotShot -= GotShot;
+        deathCry -= Hide;
+    }
+
     private void Hide(Vector3 deadAI)
     {
+        Debug.Log("Hide");
         if (!gameObject.activeInHierarchy) return;
             
         var distance = Vector3.Distance(transform.position, deadAI);
@@ -132,7 +165,8 @@ public class AI : MonoBehaviour
 
     private void InHideState()
     {
-        foreach (var hidingSpot in _hidePoints)
+        Debug.Log("InHideState");
+        foreach (var hidingSpot in _wayPoints)
         {
             var distance = Vector3.Distance(transform.position, hidingSpot.position);
             if (distance < _closestHidingSpot)
@@ -150,14 +184,28 @@ public class AI : MonoBehaviour
 
     private IEnumerator HideTimer()
     {
+        Debug.Log("Made it to Hide Timer");
         yield return new WaitForSeconds(UnityEngine.Random.Range(_minHideTime, _maxHideTime));
         _animator.SetBool("Hiding", false);
+
+        if (_index > 20)
+        {
+            Debug.Log("If _index > 15");
+            _agent.SetDestination(_wayPoints[_wayPoints.Count - 1].position);
+        }
+        else
+        {
+            Debug.Log("if _index > 15 ELSE");
+            _index = UnityEngine.Random.Range(_index + 1, _wayPoints.Count - 1);
+            _agent.SetDestination(_wayPoints[_index].position);
+        }
+        
         _currentAIState = aiStates.Run;
     }
 
     private void ColorSelector()
     {
-        var selector = UnityEngine.Random.Range(0, 8);
+        var selector = UnityEngine.Random.Range(0, 7);
         var astronaut = _astronautObject.material;
         var backpack = _astronautBackpackObject.material;
         
@@ -172,26 +220,22 @@ public class AI : MonoBehaviour
                 backpack.color = Color.cyan;
                 break;
             case 2:
-                astronaut.color = Color.gray;
-                backpack.color = Color.gray;
-                break;
-            case 3:
                 astronaut.color = Color.green;
                 backpack.color = Color.green;
                 break;
-            case 4:
+            case 3:
                 astronaut.color = Color.magenta;
                 backpack.color = Color.magenta;
                 break;
-            case 5:
+            case 4:
                 astronaut.color = Color.red;
                 backpack.color = Color.red;
                 break;
-            case 6:
+            case 5:
                 astronaut.color = Color.white;
                 backpack.color = Color.white;
                 break;
-            case 7:
+            case 6:
                 astronaut.color = Color.yellow;
                 backpack.color = Color.yellow;
                 break;

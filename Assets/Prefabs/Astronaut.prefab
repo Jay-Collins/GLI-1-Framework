@@ -264,17 +264,17 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4614011628888049955}
-  - component: {fileID: -3527260730412209568}
+  - component: {fileID: 2119255465790810995}
+  - component: {fileID: 1897955514695814118}
   - component: {fileID: -7230191452958718190}
   - component: {fileID: 4614011628897314499}
-  - component: {fileID: 1897955514695814118}
   m_Layer: 6
   m_Name: Astronaut
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4614011628888049955
 Transform:
   m_ObjectHideFlags: 0
@@ -293,7 +293,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-3527260730412209568
+--- !u!114 &2119255465790810995
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -302,17 +302,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 4614011628887954691}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b97c6f9de38b47f4c95a4c97e11a6007, type: 3}
+  m_Script: {fileID: 11500000, guid: ac4cb247bdf7e9f40ad6799e5c9e5305, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 6
-  _detectDeadDistance: 15
+  _speed: 5
   _scoreAwarded: 50
-  _minHideTime: 4
-  _maxHideTime: 10
+  _despawnTime: 5
+  _fadeOutMultiplier: 1
+  _deathSounds:
+  - {fileID: 8300000, guid: 89d31577eac1edd48a0a187f41796038, type: 3}
+  - {fileID: 8300000, guid: 70d9f4c2fcabc2d4eb47ebbd330bdfea, type: 3}
+  - {fileID: 8300000, guid: e7e9e2f775d65c044816357581fdde78, type: 3}
+  _pathCompleteSound: {fileID: 8300000, guid: 54185de18d9f1524dbaeaf5388081037, type: 3}
+  _minHideTime: 2
+  _maxHideTime: 8
   _astronautObject: {fileID: 4614011628893231107}
   _astronautBackpackObject: {fileID: 4614011628893231105}
   _animator: {fileID: 4614011628897314499}
+  _collider: {fileID: 1897955514695814118}
+--- !u!65 &1897955514695814118
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4614011628887954691}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1.5816171, z: 1}
+  m_Center: {x: 0, y: 0.7756398, z: 0}
 --- !u!195 &-7230191452958718190
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -355,19 +375,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!65 &1897955514695814118
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4614011628887954691}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1.5816171, z: 1}
-  m_Center: {x: 0, y: 0.7756398, z: 0}
 --- !u!1 &4614011628887954693
 GameObject:
   m_ObjectHideFlags: 0

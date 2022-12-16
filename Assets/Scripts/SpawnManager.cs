@@ -99,7 +99,13 @@ public class SpawnManager : MonoSingleton<SpawnManager>
         {
             SpawnAI();
             _aiSpawned++;
-            _spawnTimer = Random.Range(_stageOneSpawnTimeMin, _stageOneSpawnTimeMax);
+            _spawnTimer = stage switch
+            {
+                1 => Random.Range(_stageOneSpawnTimeMin, _stageOneSpawnTimeMax),
+                2 => Random.Range(_stageTwoSpawnTimeMin, _stageTwoSpawnTimeMax),
+                3 => Random.Range(_stageThreeSpawnTimeMin, _stageThreeSpawnTimeMax),
+                _ => Random.Range(_stageOneSpawnTimeMin, _stageOneSpawnTimeMax)
+            };
         }
     }
     
